@@ -62,38 +62,64 @@
         overflow: hidden;
         border-radius: 8px;
       }
-      
+
       @media (max-width: 768px) {
         #stage {
-            width: 100%;
-            height: 100%;
-            border-radius: 0;
-            aspect-ratio: auto;
+          width: 100%;
+          height: 100%;
+          border-radius: 0;
+          aspect-ratio: auto;
         }
       }
 
       /* Typography */
-      .font-tech { font-family: "Orbitron", sans-serif; }
-      .font-mono { font-family: "JetBrains Mono", monospace; }
+      .font-tech {
+        font-family: "Orbitron", sans-serif;
+      }
+      .font-mono {
+        font-family: "JetBrains Mono", monospace;
+      }
 
       /* Glitch Animations */
       @keyframes glitch-anim-1 {
-        0% { clip-path: inset(20% 0 80% 0); transform: translate(-2px, 1px); }
-        20% { clip-path: inset(60% 0 10% 0); transform: translate(2px, -1px); }
-        40% { clip-path: inset(40% 0 50% 0); transform: translate(-2px, 2px); }
-        60% { clip-path: inset(80% 0 5% 0); transform: translate(2px, -2px); }
-        80% { clip-path: inset(10% 0 70% 0); transform: translate(-1px, 1px); }
-        100% { clip-path: inset(30% 0 50% 0); transform: translate(1px, -1px); }
+        0% {
+          clip-path: inset(20% 0 80% 0);
+          transform: translate(-2px, 1px);
+        }
+        20% {
+          clip-path: inset(60% 0 10% 0);
+          transform: translate(2px, -1px);
+        }
+        40% {
+          clip-path: inset(40% 0 50% 0);
+          transform: translate(-2px, 2px);
+        }
+        60% {
+          clip-path: inset(80% 0 5% 0);
+          transform: translate(2px, -2px);
+        }
+        80% {
+          clip-path: inset(10% 0 70% 0);
+          transform: translate(-1px, 1px);
+        }
+        100% {
+          clip-path: inset(30% 0 50% 0);
+          transform: translate(1px, -1px);
+        }
       }
-      
+
       .glitch-text {
         position: relative;
         display: inline-block;
       }
-      .glitch-text::before, .glitch-text::after {
+      .glitch-text::before,
+      .glitch-text::after {
         content: attr(data-text);
         position: absolute;
-        top: 0; left: 0; width: 100%; height: 100%;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
         background: var(--bg);
       }
       .glitch-text::before {
@@ -126,7 +152,7 @@
       .hud-panel {
         background: rgba(10, 15, 20, 0.6);
         backdrop-filter: blur(10px);
-        border: 1px solid rgba(255,255,255,0.08);
+        border: 1px solid rgba(255, 255, 255, 0.08);
         padding: 8px 16px;
         border-radius: 4px;
         display: inline-flex;
@@ -145,7 +171,9 @@
       /* Progress Bar */
       .progress-container {
         position: absolute;
-        bottom: 0; left: 0; right: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
         height: 4px;
         background: #111;
         z-index: 50;
@@ -153,19 +181,31 @@
       .progress-fill {
         height: 100%;
         width: 0%;
-        background: linear-gradient(90deg, var(--cyan), var(--purple), var(--cyan));
+        background: linear-gradient(
+          90deg,
+          var(--cyan),
+          var(--purple),
+          var(--cyan)
+        );
         background-size: 200% 100%;
         animation: gradientMove 2s linear infinite;
         box-shadow: 0 -2px 10px var(--cyan);
       }
-      @keyframes gradientMove { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
+      @keyframes gradientMove {
+        0% {
+          background-position: 100% 0;
+        }
+        100% {
+          background-position: -100% 0;
+        }
+      }
 
       /* Start Screen */
       #start-screen {
         position: absolute;
         inset: 0;
         z-index: 100;
-        background: rgba(0,0,0,0.85);
+        background: rgba(0, 0, 0, 0.85);
         backdrop-filter: blur(20px);
         display: flex;
         flex-direction: column;
@@ -173,7 +213,7 @@
         justify-content: center;
         transition: opacity 0.8s ease;
       }
-      
+
       .btn-primary {
         margin-top: 2rem;
         background: transparent;
@@ -205,7 +245,8 @@
         justify-content: center;
         opacity: 0;
         transform: scale(0.95);
-        transition: opacity 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+        transition: opacity 0.6s cubic-bezier(0.2, 0.8, 0.2, 1),
+          transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
       }
       .scene-active {
         opacity: 1;
@@ -220,12 +261,18 @@
         border-radius: 0 8px 8px 0;
         font-family: "JetBrains Mono", monospace;
         font-size: 14px;
-        box-shadow: 20px 20px 60px rgba(0,0,0,0.5);
+        box-shadow: 20px 20px 60px rgba(0, 0, 0, 0.5);
         min-width: 300px;
       }
-      .syntax-keyword { color: #ff79c6; }
-      .syntax-string { color: #f1fa8c; }
-      .syntax-def { color: #8be9fd; }
+      .syntax-keyword {
+        color: #ff79c6;
+      }
+      .syntax-string {
+        color: #f1fa8c;
+      }
+      .syntax-def {
+        color: #8be9fd;
+      }
       .cursor {
         display: inline-block;
         width: 8px;
@@ -233,33 +280,56 @@
         background: var(--cyan);
         animation: blink 1s step-end infinite;
       }
-      @keyframes blink { 50% { opacity: 0; } }
-      
+      @keyframes blink {
+        50% {
+          opacity: 0;
+        }
+      }
+
       /* 3D Card Effect */
       .card-3d {
-        background: rgba(255,255,255,0.03);
-        border: 1px solid rgba(255,255,255,0.1);
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
         padding: 2rem;
         border-radius: 12px;
         transform-style: preserve-3d;
         transform: perspective(1000px) rotateY(0deg);
         transition: transform 0.2s;
       }
-
     </style>
   </head>
   <body>
-
     <!-- Retro Scanline Overlay -->
     <div class="scanlines"></div>
 
     <!-- Main Stage -->
     <div id="stage">
       <!-- Three.js Canvas -->
-      <canvas id="canvas-3d" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;"></canvas>
+      <canvas
+        id="canvas-3d"
+        style="
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          z-index: 0;
+        "
+      ></canvas>
 
       <!-- Scene Container -->
-      <div id="scene-root" style="position: absolute; inset: 0; z-index: 5; pointer-events: none; display: flex; align-items: center; justify-content: center;">
+      <div
+        id="scene-root"
+        style="
+          position: absolute;
+          inset: 0;
+          z-index: 5;
+          pointer-events: none;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        "
+      >
         <!-- Dynamic Content injected here -->
       </div>
 
@@ -271,7 +341,9 @@
             <div class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
             <span id="timer">00:00:00</span>
           </div>
-          <div class="hud-panel font-tech text-xs text-cyan-400 border-cyan-900">
+          <div
+            class="hud-panel font-tech text-xs text-cyan-400 border-cyan-900"
+          >
             SYSTEM: ONLINE
           </div>
         </div>
@@ -279,10 +351,23 @@
         <!-- Bottom Controls -->
         <div class="flex justify-between items-end w-full">
           <div class="flex gap-2">
-            <button id="btn-pause" class="hud-panel font-mono hover:bg-white/10 cursor-pointer text-xs">PAUSE [SPC]</button>
-            <button id="btn-mute" class="hud-panel font-mono hover:bg-white/10 cursor-pointer text-xs">MUTE [M]</button>
+            <button
+              id="btn-pause"
+              class="hud-panel font-mono hover:bg-white/10 cursor-pointer text-xs"
+            >
+              PAUSE [SPC]
+            </button>
+            <button
+              id="btn-mute"
+              class="hud-panel font-mono hover:bg-white/10 cursor-pointer text-xs"
+            >
+              MUTE [M]
+            </button>
           </div>
-          <button id="btn-download" class="hud-panel font-mono text-cyan-400 border-cyan-900 hover:bg-cyan-900/30 cursor-pointer">
+          <button
+            id="btn-download"
+            class="hud-panel font-mono text-cyan-400 border-cyan-900 hover:bg-cyan-900/30 cursor-pointer"
+          >
             DOWNLOAD_ARCHIVE
           </button>
         </div>
@@ -296,10 +381,20 @@
       <!-- Start Overlay -->
       <div id="start-screen">
         <div class="text-center">
-          <div class="font-mono text-xs text-gray-500 mb-4 tracking-widest">IMMERSIVE PORTFOLIO PROTOCOL V3</div>
-          <h1 class="font-tech text-6xl md:text-8xl text-white glitch-text" data-text="AMRITO DEY" style="margin: 0;">AMRITO DEY</h1>
+          <div class="font-mono text-xs text-gray-500 mb-4 tracking-widest">
+            IMMERSIVE PORTFOLIO PROTOCOL V3
+          </div>
+          <h1
+            class="font-tech text-6xl md:text-8xl text-white glitch-text"
+            data-text="AMRITO DEY"
+            style="margin: 0"
+          >
+            AMRITO DEY
+          </h1>
           <button id="btn-start" class="btn-primary">INITIALIZE</button>
-          <div class="mt-6 font-mono text-xs text-gray-600">HEADPHONES RECOMMENDED</div>
+          <div class="mt-6 font-mono text-xs text-gray-600">
+            HEADPHONES RECOMMENDED
+          </div>
         </div>
       </div>
     </div>
@@ -317,48 +412,61 @@
         startTime: 0,
         pauseTime: 0,
         totalOffset: 0,
-        duration: 45000 // 45 seconds total run
+        duration: 45000, // 45 seconds total run
       };
 
       const dom = {
-        stage: document.getElementById('stage'),
-        root: document.getElementById('scene-root'),
-        startScreen: document.getElementById('start-screen'),
-        timer: document.getElementById('timer'),
-        progress: document.getElementById('progress-bar'),
-        btnStart: document.getElementById('btn-start'),
-        btnPause: document.getElementById('btn-pause'),
-        btnMute: document.getElementById('btn-mute'),
-        btnDownload: document.getElementById('btn-download')
+        stage: document.getElementById("stage"),
+        root: document.getElementById("scene-root"),
+        startScreen: document.getElementById("start-screen"),
+        timer: document.getElementById("timer"),
+        progress: document.getElementById("progress-bar"),
+        btnStart: document.getElementById("btn-start"),
+        btnPause: document.getElementById("btn-pause"),
+        btnMute: document.getElementById("btn-mute"),
+        btnDownload: document.getElementById("btn-download"),
       };
 
       // ==========================================
       // 1. THREE.JS VISUAL CORE
       // ==========================================
       const visualCore = {
-        scene: null, camera: null, renderer: null,
-        sphere: null, particles: null,
-        mouseX: 0, mouseY: 0,
-        
+        scene: null,
+        camera: null,
+        renderer: null,
+        sphere: null,
+        particles: null,
+        mouseX: 0,
+        mouseY: 0,
+
         init() {
-          const canvas = document.getElementById('canvas-3d');
+          const canvas = document.getElementById("canvas-3d");
           this.scene = new THREE.Scene();
           this.scene.fog = new THREE.FogExp2(0x000000, 0.002);
 
-          this.camera = new THREE.PerspectiveCamera(75, dom.stage.clientWidth / dom.stage.clientHeight, 0.1, 1000);
+          this.camera = new THREE.PerspectiveCamera(
+            75,
+            dom.stage.clientWidth / dom.stage.clientHeight,
+            0.1,
+            1000
+          );
           this.camera.position.z = 30;
 
-          this.renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+          this.renderer = new THREE.WebGLRenderer({
+            canvas,
+            alpha: true,
+            antialias: true,
+          });
           this.renderer.setSize(dom.stage.clientWidth, dom.stage.clientHeight);
           this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
           // Create Neural Globe (Wireframe Icosahedron)
           const geometry = new THREE.IcosahedronGeometry(10, 2);
-          const material = new THREE.MeshBasicMaterial({ 
-            color: 0x222222, 
+          const material = new THREE.MeshBasicMaterial({
+            color: 0x222222,
             wireframe: true,
             transparent: true,
-            opacity: 0.3
+            opacity: 0.3,
           });
           this.sphere = new THREE.Mesh(geometry, material);
           this.scene.add(this.sphere);
@@ -367,16 +475,16 @@
           const pGeo = new THREE.BufferGeometry();
           const pCount = 800;
           const posArray = new Float32Array(pCount * 3);
-          for(let i=0; i<pCount*3; i++) {
+          for (let i = 0; i < pCount * 3; i++) {
             posArray[i] = (Math.random() - 0.5) * 100;
           }
-          pGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+          pGeo.setAttribute("position", new THREE.BufferAttribute(posArray, 3));
           const pMat = new THREE.PointsMaterial({
             size: 0.15,
             color: 0x00f3ff,
             transparent: true,
             opacity: 0.8,
-            blending: THREE.AdditiveBlending
+            blending: THREE.AdditiveBlending,
           });
           this.particles = new THREE.Points(pGeo, pMat);
           this.scene.add(this.particles);
@@ -386,14 +494,17 @@
           this.scene.add(ambientLight);
 
           // Resize Handler
-          window.addEventListener('resize', () => {
+          window.addEventListener("resize", () => {
             this.camera.aspect = dom.stage.clientWidth / dom.stage.clientHeight;
             this.camera.updateProjectionMatrix();
-            this.renderer.setSize(dom.stage.clientWidth, dom.stage.clientHeight);
+            this.renderer.setSize(
+              dom.stage.clientWidth,
+              dom.stage.clientHeight
+            );
           });
 
           // Mouse Parallax
-          dom.stage.addEventListener('mousemove', (e) => {
+          dom.stage.addEventListener("mousemove", (e) => {
             const rect = dom.stage.getBoundingClientRect();
             this.mouseX = ((e.clientX - rect.left) / rect.width) * 2 - 1;
             this.mouseY = -((e.clientY - rect.top) / rect.height) * 2 + 1;
@@ -404,7 +515,7 @@
 
         animate() {
           requestAnimationFrame(() => this.animate());
-          
+
           const time = performance.now() * 0.001;
 
           // Rotate Sphere
@@ -422,8 +533,10 @@
           }
 
           // Camera Parallax
-          this.camera.position.x += (this.mouseX * 2 - this.camera.position.x) * 0.05;
-          this.camera.position.y += (this.mouseY * 2 - this.camera.position.y) * 0.05;
+          this.camera.position.x +=
+            (this.mouseX * 2 - this.camera.position.x) * 0.05;
+          this.camera.position.y +=
+            (this.mouseY * 2 - this.camera.position.y) * 0.05;
           this.camera.lookAt(this.scene.position);
 
           this.renderer.render(this.scene, this.camera);
@@ -433,111 +546,109 @@
         warpSpeed() {
           // Temporary speed up particles
           // Implementation simplified for stability
-        }
+        },
       };
 
       // ==========================================
-      // 2. CINEMATIC AUDIO ENGINE
+      // 2. CINEMATIC AUDIO ENGINE (Updated for MP3)
       // ==========================================
       const audioCore = {
         ctx: null,
         master: null,
-        droneNode: null,
-        filterNode: null,
+        bgMusic: null, // New slot for the music file
 
         init() {
           const AC = window.AudioContext || window.webkitAudioContext;
           this.ctx = new AC();
           this.master = this.ctx.createGain();
-          this.master.gain.value = 0.2; // Base volume
+          this.master.gain.value = 0.3; // Master Volume
           this.master.connect(this.ctx.destination);
 
-          // Drone (Background Hum)
-          this.droneNode = this.ctx.createOscillator();
-          this.droneNode.type = 'sawtooth';
-          this.droneNode.frequency.value = 50;
-          
-          // Lowpass filter for "Underwater" feel
-          this.filterNode = this.ctx.createBiquadFilter();
-          this.filterNode.type = 'lowpass';
-          this.filterNode.frequency.value = 200;
+          // --- MUSIC LOADER ---
+          // !!! IMPORTANT: CHANGE 'your-music-file.mp3' TO YOUR SONG'S FILENAME !!!
+          this.bgMusic = new Audio(
+            "/intro-jingle-quotthe-boot-fog-6quot-dark-trailer-143730.mp3"
+          );
+          this.bgMusic.loop = true; // Loop the music forever
+          this.bgMusic.volume = 0.4; // Background music volume (0.0 to 1.0)
 
-          this.droneNode.connect(this.filterNode);
-          this.filterNode.connect(this.master);
-          this.droneNode.start();
+          // Connect music to AudioContext for processing (optional, ensures sync)
+          const source = this.ctx.createMediaElementSource(this.bgMusic);
+          source.connect(this.master);
 
-          // LFO for filter movement
-          const lfo = this.ctx.createOscillator();
-          lfo.frequency.value = 0.1;
-          const lfoGain = this.ctx.createGain();
-          lfoGain.gain.value = 150;
-          lfo.connect(lfoGain);
-          lfoGain.connect(this.filterNode.frequency);
-          lfo.start();
+          // Start playing (will require user interaction)
+          this.bgMusic
+            .play()
+            .catch((e) =>
+              console.log(
+                "Audio requires user interaction to start. Click 'Initialize'."
+              )
+            );
         },
 
         playSfx(type) {
           if (!this.ctx) return;
           const osc = this.ctx.createOscillator();
           const gain = this.ctx.createGain();
-          
+
           osc.connect(gain);
           gain.connect(this.master);
 
           const now = this.ctx.currentTime;
 
-          if (type === 'glitch') {
-            // White noise burst approximation
-            osc.type = 'square';
-            osc.frequency.setValueAtTime(Math.random() * 1000 + 200, now);
-            osc.frequency.exponentialRampToValueAtTime(100, now + 0.1);
-            gain.gain.setValueAtTime(0.1, now);
+          // SFX for Glitches and Booms (keep these!)
+          if (type === "glitch") {
+            osc.type = "sawtooth";
+            osc.frequency.setValueAtTime(100, now);
+            osc.frequency.linearRampToValueAtTime(800, now + 0.1);
+            gain.gain.setValueAtTime(0.15, now);
             gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
             osc.start(now);
             osc.stop(now + 0.1);
-          } else if (type === 'boom') {
-            // Deep impact
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(150, now);
-            osc.frequency.exponentialRampToValueAtTime(40, now + 0.5);
-            gain.gain.setValueAtTime(0.5, now);
-            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.8);
+          } else if (type === "boom") {
+            osc.type = "sine";
+            osc.frequency.setValueAtTime(100, now);
+            osc.frequency.exponentialRampToValueAtTime(30, now + 1.5);
+            gain.gain.setValueAtTime(0.8, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 1.5);
             osc.start(now);
-            osc.stop(now + 0.8);
-          } else if (type === 'type') {
-            // High ping
-            osc.type = 'triangle';
-            osc.frequency.value = 800;
-            gain.gain.setValueAtTime(0.05, now);
-            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+            osc.stop(now + 1.5);
+          } else if (type === "type") {
+            osc.type = "square";
+            osc.frequency.value = 1200;
+            gain.gain.setValueAtTime(0.02, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
             osc.start(now);
-            osc.stop(now + 0.05);
+            osc.stop(now + 0.03);
           }
         },
 
         toggleMute(isMuted) {
-            if(this.master) this.master.gain.value = isMuted ? 0 : 0.2;
-        }
+          // Control master gain and HTML audio element
+          if (this.master) this.master.gain.value = isMuted ? 0 : 0.3;
+          if (this.bgMusic)
+            isMuted ? this.bgMusic.pause() : this.bgMusic.play();
+        },
       };
 
       // ==========================================
       // 3. TIMELINE & SCENE MANAGER
       // ==========================================
-      
+
       // Utility: Typewriter effect
       function typeWriter(elementId, text, speed = 50) {
         const el = document.getElementById(elementId);
-        if(!el) return;
-        el.innerHTML = '';
+        if (!el) return;
+        el.innerHTML = "";
         let i = 0;
         function type() {
-            if (i < text.length) {
-                el.innerHTML += text.charAt(i);
-                i++;
-                // Random typing variation
-                if(Math.random() > 0.8) audioCore.playSfx('type'); 
-                setTimeout(type, speed + (Math.random() * 30));
-            }
+          if (i < text.length) {
+            el.innerHTML += text.charAt(i);
+            i++;
+            // Random typing variation
+            if (Math.random() > 0.8) audioCore.playSfx("type");
+            setTimeout(type, speed + Math.random() * 30);
+          }
         }
         type();
       }
@@ -557,8 +668,8 @@
                 </div>
               </div>
             `;
-            audioCore.playSfx('boom');
-          }
+            audioCore.playSfx("boom");
+          },
         },
         {
           // 1: SKILLS (The Builder)
@@ -583,16 +694,19 @@
             `;
             // Trigger typing slightly after render
             setTimeout(() => {
-                const code = `<span class="syntax-keyword">const</span> <span class="syntax-def">stack</span> = {\n  lang: [<span class="syntax-string">'JS'</span>, <span class="syntax-string">'Python'</span>],\n  frame: [<span class="syntax-string">'React'</span>, <span class="syntax-string">'Three.js'</span>],\n  db: <span class="syntax-string">'MongoDB'</span>\n};`;
-                // Simple simulation of typing complex HTML
-                const target = document.getElementById('code-target');
-                target.innerHTML = code; 
-                // Use simple reveal animation for HTML content to avoid parsing issues
-                target.style.opacity = 0;
-                target.animate([{opacity:0}, {opacity:1}], {duration: 500, fill:'forwards'});
-                audioCore.playSfx('type');
+              const code = `<span class="syntax-keyword">const</span> <span class="syntax-def">stack</span> = {\n  lang: [<span class="syntax-string">'JS'</span>, <span class="syntax-string">'Python'</span>],\n  frame: [<span class="syntax-string">'React'</span>, <span class="syntax-string">'Three.js'</span>],\n  db: <span class="syntax-string">'MongoDB'</span>\n};`;
+              // Simple simulation of typing complex HTML
+              const target = document.getElementById("code-target");
+              target.innerHTML = code;
+              // Use simple reveal animation for HTML content to avoid parsing issues
+              target.style.opacity = 0;
+              target.animate([{ opacity: 0 }, { opacity: 1 }], {
+                duration: 500,
+                fill: "forwards",
+              });
+              audioCore.playSfx("type");
             }, 500);
-          }
+          },
         },
         {
           // 2: ORIGIN (The Struggle)
@@ -608,8 +722,8 @@
                  </div>
               </div>
             `;
-            audioCore.playSfx('glitch');
-          }
+            audioCore.playSfx("glitch");
+          },
         },
         {
           // 3: VENTURES (Cards)
@@ -632,8 +746,8 @@
                  </div>
               </div>
             `;
-            audioCore.playSfx('boom');
-          }
+            audioCore.playSfx("boom");
+          },
         },
         {
           // 4: THE DREAM (Gold)
@@ -652,14 +766,14 @@
                  </div>
               </div>
             `;
-             audioCore.playSfx('boom');
-          }
+            audioCore.playSfx("boom");
+          },
         },
         {
           // 5: VISION
           at: 24000,
           render: (el) => {
-             el.innerHTML = `
+            el.innerHTML = `
               <div class="scene-content scene-active w-full max-w-4xl px-8">
                  <div class="font-mono text-gray-500 mb-8">LOADING_MANIFESTO...</div>
                  <div class="space-y-6">
@@ -681,14 +795,14 @@
                  </style>
               </div>
             `;
-            audioCore.playSfx('type');
-          }
+            audioCore.playSfx("type");
+          },
         },
         {
           // 6: OUTRO
           at: 30000,
           render: (el) => {
-             el.innerHTML = `
+            el.innerHTML = `
               <div class="scene-content scene-active text-center">
                  <p class="font-mono text-cyan-400 mb-4">SEQUENCE COMPLETE</p>
                  <h1 class="font-tech text-6xl md:text-8xl text-white mb-8 glitch-text" data-text="AMRITO DEY">AMRITO DEY</h1>
@@ -698,65 +812,67 @@
                  </div>
               </div>
             `;
-             audioCore.playSfx('boom');
-          }
-        }
+            audioCore.playSfx("boom");
+          },
+        },
       ];
 
       // ==========================================
       // 4. MAIN LOOP
       // ==========================================
-      
+
       let animationFrame;
       let currentSceneIndex = -1;
 
       function startTimeline() {
         if (state.started) return;
-        
+
         // Init systems
         audioCore.init();
         visualCore.init();
-        
+
         // UI Transition
         dom.startScreen.style.opacity = 0;
-        setTimeout(() => dom.startScreen.style.display = 'none', 800);
-        
+        setTimeout(() => (dom.startScreen.style.display = "none"), 800);
+
         state.started = true;
         state.startTime = performance.now();
-        
+
         loop();
       }
 
       function loop() {
         if (state.paused) {
-            animationFrame = requestAnimationFrame(loop);
-            return;
+          animationFrame = requestAnimationFrame(loop);
+          return;
         }
 
         const now = performance.now();
         const elapsed = now - state.startTime - state.totalOffset;
 
         if (elapsed > state.duration) {
-            // End state if needed, but Outro usually holds
+          // End state if needed, but Outro usually holds
         }
 
         // Scene Management
         // Find the latest scene that should be active
         let activeIndex = -1;
-        for(let i=0; i<scenes.length; i++) {
-            if (elapsed >= scenes[i].at) activeIndex = i;
+        for (let i = 0; i < scenes.length; i++) {
+          if (elapsed >= scenes[i].at) activeIndex = i;
         }
 
         if (activeIndex !== currentSceneIndex && activeIndex !== -1) {
-            currentSceneIndex = activeIndex;
-            scenes[activeIndex].render(dom.root);
+          currentSceneIndex = activeIndex;
+          scenes[activeIndex].render(dom.root);
         }
 
         // Update Timer & Progress
         const sec = Math.floor(elapsed / 1000);
         const ms = Math.floor((elapsed % 1000) / 10);
-        dom.timer.innerText = `00:${sec < 10 ? '0'+sec : sec}:${ms < 10 ? '0'+ms : ms}`;
-        
+        dom.timer.innerText = `00:${sec < 10 ? "0" + sec : sec}:${
+          ms < 10 ? "0" + ms : ms
+        }`;
+
         const pct = Math.min((elapsed / 32000) * 100, 100); // 32s is roughly end of content
         dom.progress.style.width = `${pct}%`;
 
@@ -766,26 +882,26 @@
       // ==========================================
       // 5. CONTROLS
       // ==========================================
-      
-      dom.btnStart.addEventListener('click', startTimeline);
-      
-      dom.btnPause.addEventListener('click', togglePause);
-      document.addEventListener('keydown', (e) => {
-        if (e.code === 'Space') togglePause();
-        if (e.key === 'm' || e.key === 'M') toggleMute();
+
+      dom.btnStart.addEventListener("click", startTimeline);
+
+      dom.btnPause.addEventListener("click", togglePause);
+      document.addEventListener("keydown", (e) => {
+        if (e.code === "Space") togglePause();
+        if (e.key === "m" || e.key === "M") toggleMute();
       });
 
       function togglePause() {
-        if(!state.started) return;
+        if (!state.started) return;
         state.paused = !state.paused;
         dom.btnPause.innerText = state.paused ? "RESUME [SPC]" : "PAUSE [SPC]";
-        
-        if(state.paused) {
-            state.pauseTime = performance.now();
-            if(audioCore.ctx) audioCore.ctx.suspend();
+
+        if (state.paused) {
+          state.pauseTime = performance.now();
+          if (audioCore.ctx) audioCore.ctx.suspend();
         } else {
-            state.totalOffset += (performance.now() - state.pauseTime);
-            if(audioCore.ctx) audioCore.ctx.resume();
+          state.totalOffset += performance.now() - state.pauseTime;
+          if (audioCore.ctx) audioCore.ctx.resume();
         }
       }
 
@@ -796,7 +912,7 @@
         dom.btnMute.style.color = state.muted ? "red" : "white";
       }
 
-      dom.btnDownload.addEventListener('click', () => {
+      dom.btnDownload.addEventListener("click", () => {
         const html = document.documentElement.outerHTML;
         const blob = new Blob([html], { type: "text/html" });
         const url = URL.createObjectURL(blob);
@@ -806,13 +922,15 @@
         a.click();
       });
 
-      window.openShare = function() {
+      window.openShare = function () {
         alert("Profile URL copied to clipboard (Simulation)");
-      }
+      };
 
       // Initial console signature
-      console.log("%c AMRITO DEY // SYSTEM V3 READY", "background: #000; color: #00f3ff; font-size: 12px; padding: 4px;");
-
+      console.log(
+        "%c AMRITO DEY // SYSTEM V3 READY",
+        "background: #000; color: #00f3ff; font-size: 12px; padding: 4px;"
+      );
     </script>
   </body>
 </html>
