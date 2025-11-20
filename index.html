@@ -1,463 +1,818 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Amrito Dey - Motion Profile</title>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Amrito Dey — Kinetic Profile (v3)</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;600;900&family=JetBrains+Mono:wght@400;700&family=Orbitron:wght@500;900&display=swap" rel="stylesheet">
+    <!-- Three.js for 3D Background -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;600;900&family=JetBrains+Mono:wght@400;700&family=Orbitron:wght@400;700;900&display=swap"
+      rel="stylesheet"
+    />
     <style>
-        body {
-            background-color: #050505;
-            color: white;
-            overflow: hidden;
-            font-family: 'Inter', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
+      :root {
+        --bg: #030304;
+        --cyan: #00f3ff;
+        --purple: #bc13fe;
+        --gold: #ffd700;
+        --danger: #ff2a2a;
+        --panel: rgba(10, 11, 16, 0.85);
+      }
 
-        /* The Stage - 16:9 Ratio */
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: #e6eef6;
+        font-family: "Inter", sans-serif;
+        overflow: hidden;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* CRT Scanline Overlay */
+      .scanlines {
+        position: fixed;
+        inset: 0;
+        background: linear-gradient(
+          to bottom,
+          rgba(255, 255, 255, 0),
+          rgba(255, 255, 255, 0) 50%,
+          rgba(0, 0, 0, 0.2) 50%,
+          rgba(0, 0, 0, 0.2)
+        );
+        background-size: 100% 4px;
+        pointer-events: none;
+        z-index: 999;
+        opacity: 0.15;
+      }
+
+      /* Stage Container */
+      #stage {
+        position: relative;
+        width: 100%;
+        max-width: 1400px;
+        aspect-ratio: 16/9;
+        background: radial-gradient(circle at center, #0f1014 0%, #000000 100%);
+        box-shadow: 0 0 80px rgba(0, 243, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        overflow: hidden;
+        border-radius: 8px;
+      }
+      
+      @media (max-width: 768px) {
         #stage {
-            position: relative;
-            width: 100%;
-            max-width: 1000px;
-            aspect-ratio: 16/9;
-            background: #0a0a0a;
-            overflow: hidden;
-            box-shadow: 0 0 50px rgba(0, 255, 255, 0.1);
-            border: 1px solid #333;
-        }
-
-        #bg-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
             width: 100%;
             height: 100%;
-            z-index: 0;
-            opacity: 0.4;
+            border-radius: 0;
+            aspect-ratio: auto;
         }
+      }
 
-        #ui-layer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            pointer-events: none;
-        }
+      /* Typography */
+      .font-tech { font-family: "Orbitron", sans-serif; }
+      .font-mono { font-family: "JetBrains Mono", monospace; }
 
-        /* Utilities */
-        .font-mono { font-family: 'JetBrains Mono', monospace; }
-        .font-tech { font-family: 'Orbitron', sans-serif; }
-        
-        .text-glow-blue { text-shadow: 0 0 10px rgba(0, 243, 255, 0.8); }
-        .text-glow-purple { text-shadow: 0 0 10px rgba(188, 19, 254, 0.8); }
-        .text-glow-gold { text-shadow: 0 0 15px rgba(255, 215, 0, 0.8); }
+      /* Glitch Animations */
+      @keyframes glitch-anim-1 {
+        0% { clip-path: inset(20% 0 80% 0); transform: translate(-2px, 1px); }
+        20% { clip-path: inset(60% 0 10% 0); transform: translate(2px, -1px); }
+        40% { clip-path: inset(40% 0 50% 0); transform: translate(-2px, 2px); }
+        60% { clip-path: inset(80% 0 5% 0); transform: translate(2px, -2px); }
+        80% { clip-path: inset(10% 0 70% 0); transform: translate(-1px, 1px); }
+        100% { clip-path: inset(30% 0 50% 0); transform: translate(1px, -1px); }
+      }
+      
+      .glitch-text {
+        position: relative;
+        display: inline-block;
+      }
+      .glitch-text::before, .glitch-text::after {
+        content: attr(data-text);
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: var(--bg);
+      }
+      .glitch-text::before {
+        left: 2px;
+        text-shadow: -1px 0 var(--purple);
+        clip-path: inset(0 0 0 0);
+        animation: glitch-anim-1 2.5s infinite linear alternate-reverse;
+        opacity: 0.7;
+      }
+      .glitch-text::after {
+        left: -2px;
+        text-shadow: -1px 0 var(--cyan);
+        clip-path: inset(0 0 0 0);
+        animation: glitch-anim-1 3s infinite linear alternate-reverse;
+        opacity: 0.7;
+      }
 
-        /* Animations */
-        .fade-in { animation: fadeIn 0.5s forwards; }
-        .fade-out { animation: fadeOut 0.5s forwards; }
-        .slide-up { animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        .zoom-in { animation: zoomIn 4s linear forwards; }
-        .blink { animation: blink 0.8s infinite; }
+      /* UI Layers */
+      #ui-layer {
+        position: absolute;
+        inset: 0;
+        z-index: 10;
+        pointer-events: none;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 2rem;
+      }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
-        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes zoomIn { from { transform: scale(1); } to { transform: scale(1.1); } }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+      .hud-panel {
+        background: rgba(10, 15, 20, 0.6);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.08);
+        padding: 8px 16px;
+        border-radius: 4px;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 12px;
+        letter-spacing: 1px;
+        pointer-events: auto;
+        transition: all 0.3s ease;
+      }
+      .hud-panel:hover {
+        border-color: var(--cyan);
+        box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
+      }
 
-        /* Glitch Effect */
-        .glitch {
-            position: relative;
-        }
-        .glitch::before, .glitch::after {
-            content: attr(data-text);
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #0a0a0a;
-        }
-        .glitch::before {
-            left: 2px;
-            text-shadow: -1px 0 #ff00c1;
-            clip: rect(44px, 450px, 56px, 0);
-            animation: glitch-anim 5s infinite linear alternate-reverse;
-        }
-        .glitch::after {
-            left: -2px;
-            text-shadow: -1px 0 #00fff9;
-            clip: rect(44px, 450px, 56px, 0);
-            animation: glitch-anim2 5s infinite linear alternate-reverse;
-        }
+      /* Progress Bar */
+      .progress-container {
+        position: absolute;
+        bottom: 0; left: 0; right: 0;
+        height: 4px;
+        background: #111;
+        z-index: 50;
+      }
+      .progress-fill {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, var(--cyan), var(--purple), var(--cyan));
+        background-size: 200% 100%;
+        animation: gradientMove 2s linear infinite;
+        box-shadow: 0 -2px 10px var(--cyan);
+      }
+      @keyframes gradientMove { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
 
-        @keyframes glitch-anim {
-            0% { clip: rect(34px, 9999px, 11px, 0); }
-            20% { clip: rect(68px, 9999px, 96px, 0); }
-            40% { clip: rect(12px, 9999px, 5px, 0); }
-            60% { clip: rect(89px, 9999px, 43px, 0); }
-            80% { clip: rect(2px, 9999px, 28px, 0); }
-            100% { clip: rect(56px, 9999px, 83px, 0); }
-        }
-        @keyframes glitch-anim2 {
-            0% { clip: rect(14px, 9999px, 51px, 0); }
-            20% { clip: rect(38px, 9999px, 16px, 0); }
-            40% { clip: rect(92px, 9999px, 55px, 0); }
-            60% { clip: rect(19px, 9999px, 23px, 0); }
-            80% { clip: rect(42px, 9999px, 88px, 0); }
-            100% { clip: rect(76px, 9999px, 33px, 0); }
-        }
+      /* Start Screen */
+      #start-screen {
+        position: absolute;
+        inset: 0;
+        z-index: 100;
+        background: rgba(0,0,0,0.85);
+        backdrop-filter: blur(20px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        transition: opacity 0.8s ease;
+      }
+      
+      .btn-primary {
+        margin-top: 2rem;
+        background: transparent;
+        border: 1px solid var(--cyan);
+        color: var(--cyan);
+        padding: 1rem 3rem;
+        font-family: "Orbitron", sans-serif;
+        font-weight: 700;
+        letter-spacing: 4px;
+        cursor: pointer;
+        text-transform: uppercase;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s;
+      }
+      .btn-primary:hover {
+        background: var(--cyan);
+        color: #000;
+        box-shadow: 0 0 40px var(--cyan);
+      }
 
-        /* Start Button Overlay */
-        #start-screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.9);
-            z-index: 100;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-        }
+      /* Scene Transition Styles */
+      .scene-content {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transform: scale(0.95);
+        transition: opacity 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+      .scene-active {
+        opacity: 1;
+        transform: scale(1);
+      }
 
-        .btn-cyber {
-            background: transparent;
-            border: 2px solid #00f3ff;
-            color: #00f3ff;
-            padding: 15px 40px;
-            font-family: 'Orbitron';
-            font-size: 1.2rem;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            cursor: pointer;
-            transition: all 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
-        .btn-cyber:hover {
-            background: #00f3ff;
-            color: black;
-            box-shadow: 0 0 20px #00f3ff;
-        }
-
-        /* Progress Bar */
-        #progress-bar {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            height: 4px;
-            background: #00f3ff;
-            width: 0%;
-            transition: width 0.1s linear;
-            z-index: 50;
-        }
-
-        /* Custom Elements */
-        .tag-badge {
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            margin: 5px;
-            display: inline-block;
-        }
-        
-        /* Code typing container */
-        .code-window {
-            background: #1e1e1e;
-            border-left: 4px solid #00f3ff;
-            padding: 20px;
-            font-family: 'JetBrains Mono', monospace;
-            color: #d4d4d4;
-            width: 80%;
-            border-radius: 0 10px 10px 0;
-            box-shadow: 10px 10px 30px rgba(0,0,0,0.5);
-        }
-        .keyword { color: #569cd6; }
-        .string { color: #ce9178; }
-        .func { color: #dcdcaa; }
+      /* Code Block Styling */
+      .code-editor {
+        background: #0d0e12;
+        border-left: 3px solid var(--purple);
+        padding: 20px;
+        border-radius: 0 8px 8px 0;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 14px;
+        box-shadow: 20px 20px 60px rgba(0,0,0,0.5);
+        min-width: 300px;
+      }
+      .syntax-keyword { color: #ff79c6; }
+      .syntax-string { color: #f1fa8c; }
+      .syntax-def { color: #8be9fd; }
+      .cursor {
+        display: inline-block;
+        width: 8px;
+        height: 16px;
+        background: var(--cyan);
+        animation: blink 1s step-end infinite;
+      }
+      @keyframes blink { 50% { opacity: 0; } }
+      
+      /* 3D Card Effect */
+      .card-3d {
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.1);
+        padding: 2rem;
+        border-radius: 12px;
+        transform-style: preserve-3d;
+        transform: perspective(1000px) rotateY(0deg);
+        transition: transform 0.2s;
+      }
 
     </style>
-</head>
-<body>
+  </head>
+  <body>
 
+    <!-- Retro Scanline Overlay -->
+    <div class="scanlines"></div>
+
+    <!-- Main Stage -->
     <div id="stage">
-        <canvas id="bg-canvas"></canvas>
-        
-        <!-- Animation Layer -->
-        <div id="ui-layer"></div>
-        
-        <!-- Progress Timeline -->
-        <div id="progress-bar"></div>
+      <!-- Three.js Canvas -->
+      <canvas id="canvas-3d" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;"></canvas>
 
-        <!-- HUD Elements (Always visible during playback) -->
-        <div id="hud" class="absolute top-4 left-4 text-xs font-mono text-gray-500 opacity-0 transition-opacity duration-500">
-            REC :: <span id="timer">00:00</span> <span class="text-red-500">●</span>
-        </div>
-        <div id="hud-bottom" class="absolute bottom-4 right-4 text-xs font-mono text-gray-500 opacity-0 transition-opacity duration-500">
-            SYS.STATUS: ONLINE // AM.DEY
+      <!-- Scene Container -->
+      <div id="scene-root" style="position: absolute; inset: 0; z-index: 5; pointer-events: none; display: flex; align-items: center; justify-content: center;">
+        <!-- Dynamic Content injected here -->
+      </div>
+
+      <!-- UI HUD -->
+      <div id="ui-layer">
+        <!-- Top Bar -->
+        <div class="flex justify-between w-full">
+          <div class="hud-panel font-mono">
+            <div class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
+            <span id="timer">00:00:00</span>
+          </div>
+          <div class="hud-panel font-tech text-xs text-cyan-400 border-cyan-900">
+            SYSTEM: ONLINE
+          </div>
         </div>
 
-        <!-- Start Screen -->
-        <div id="start-screen">
-            <h1 class="text-4xl font-tech text-white mb-2 tracking-widest">PROFILE LOADING...</h1>
-            <p class="text-gray-400 font-mono mb-8 text-sm">INITIALIZING VISUAL SEQUENCE</p>
-            <button class="btn-cyber" onclick="startSequence()">Initialize</button>
+        <!-- Bottom Controls -->
+        <div class="flex justify-between items-end w-full">
+          <div class="flex gap-2">
+            <button id="btn-pause" class="hud-panel font-mono hover:bg-white/10 cursor-pointer text-xs">PAUSE [SPC]</button>
+            <button id="btn-mute" class="hud-panel font-mono hover:bg-white/10 cursor-pointer text-xs">MUTE [M]</button>
+          </div>
+          <button id="btn-download" class="hud-panel font-mono text-cyan-400 border-cyan-900 hover:bg-cyan-900/30 cursor-pointer">
+            DOWNLOAD_ARCHIVE
+          </button>
         </div>
+      </div>
+
+      <!-- Progress Line -->
+      <div class="progress-container">
+        <div id="progress-bar" class="progress-fill"></div>
+      </div>
+
+      <!-- Start Overlay -->
+      <div id="start-screen">
+        <div class="text-center">
+          <div class="font-mono text-xs text-gray-500 mb-4 tracking-widest">IMMERSIVE PORTFOLIO PROTOCOL V3</div>
+          <h1 class="font-tech text-6xl md:text-8xl text-white glitch-text" data-text="AMRITO DEY" style="margin: 0;">AMRITO DEY</h1>
+          <button id="btn-start" class="btn-primary">INITIALIZE</button>
+          <div class="mt-6 font-mono text-xs text-gray-600">HEADPHONES RECOMMENDED</div>
+        </div>
+      </div>
     </div>
 
     <script>
-        // --- Utilities ---
-        const stage = document.getElementById('ui-layer');
-        const progressBar = document.getElementById('progress-bar');
-        const timerDisplay = document.getElementById('timer');
+      /* ================================================================
+        SYSTEM CORE: AUDIO, VISUALS, TIMELINE
+        ================================================================
+      */
+
+      const state = {
+        started: false,
+        paused: false,
+        muted: false,
+        startTime: 0,
+        pauseTime: 0,
+        totalOffset: 0,
+        duration: 45000 // 45 seconds total run
+      };
+
+      const dom = {
+        stage: document.getElementById('stage'),
+        root: document.getElementById('scene-root'),
+        startScreen: document.getElementById('start-screen'),
+        timer: document.getElementById('timer'),
+        progress: document.getElementById('progress-bar'),
+        btnStart: document.getElementById('btn-start'),
+        btnPause: document.getElementById('btn-pause'),
+        btnMute: document.getElementById('btn-mute'),
+        btnDownload: document.getElementById('btn-download')
+      };
+
+      // ==========================================
+      // 1. THREE.JS VISUAL CORE
+      // ==========================================
+      const visualCore = {
+        scene: null, camera: null, renderer: null,
+        sphere: null, particles: null,
+        mouseX: 0, mouseY: 0,
         
-        const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+        init() {
+          const canvas = document.getElementById('canvas-3d');
+          this.scene = new THREE.Scene();
+          this.scene.fog = new THREE.FogExp2(0x000000, 0.002);
+
+          this.camera = new THREE.PerspectiveCamera(75, dom.stage.clientWidth / dom.stage.clientHeight, 0.1, 1000);
+          this.camera.position.z = 30;
+
+          this.renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+          this.renderer.setSize(dom.stage.clientWidth, dom.stage.clientHeight);
+          this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+          // Create Neural Globe (Wireframe Icosahedron)
+          const geometry = new THREE.IcosahedronGeometry(10, 2);
+          const material = new THREE.MeshBasicMaterial({ 
+            color: 0x222222, 
+            wireframe: true,
+            transparent: true,
+            opacity: 0.3
+          });
+          this.sphere = new THREE.Mesh(geometry, material);
+          this.scene.add(this.sphere);
+
+          // Floating Data Particles
+          const pGeo = new THREE.BufferGeometry();
+          const pCount = 800;
+          const posArray = new Float32Array(pCount * 3);
+          for(let i=0; i<pCount*3; i++) {
+            posArray[i] = (Math.random() - 0.5) * 100;
+          }
+          pGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+          const pMat = new THREE.PointsMaterial({
+            size: 0.15,
+            color: 0x00f3ff,
+            transparent: true,
+            opacity: 0.8,
+            blending: THREE.AdditiveBlending
+          });
+          this.particles = new THREE.Points(pGeo, pMat);
+          this.scene.add(this.particles);
+
+          // Ambient Light
+          const ambientLight = new THREE.AmbientLight(0x404040);
+          this.scene.add(ambientLight);
+
+          // Resize Handler
+          window.addEventListener('resize', () => {
+            this.camera.aspect = dom.stage.clientWidth / dom.stage.clientHeight;
+            this.camera.updateProjectionMatrix();
+            this.renderer.setSize(dom.stage.clientWidth, dom.stage.clientHeight);
+          });
+
+          // Mouse Parallax
+          dom.stage.addEventListener('mousemove', (e) => {
+            const rect = dom.stage.getBoundingClientRect();
+            this.mouseX = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+            this.mouseY = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+          });
+
+          this.animate();
+        },
+
+        animate() {
+          requestAnimationFrame(() => this.animate());
+          
+          const time = performance.now() * 0.001;
+
+          // Rotate Sphere
+          if (this.sphere) {
+            this.sphere.rotation.x += 0.001;
+            this.sphere.rotation.y += 0.002;
+            // Breathing effect
+            const scale = 1 + Math.sin(time) * 0.05;
+            this.sphere.scale.set(scale, scale, scale);
+          }
+
+          // Rotate Particles
+          if (this.particles) {
+            this.particles.rotation.y = -time * 0.05;
+          }
+
+          // Camera Parallax
+          this.camera.position.x += (this.mouseX * 2 - this.camera.position.x) * 0.05;
+          this.camera.position.y += (this.mouseY * 2 - this.camera.position.y) * 0.05;
+          this.camera.lookAt(this.scene.position);
+
+          this.renderer.render(this.scene, this.camera);
+        },
+
+        // Effects triggers
+        warpSpeed() {
+          // Temporary speed up particles
+          // Implementation simplified for stability
+        }
+      };
+
+      // ==========================================
+      // 2. CINEMATIC AUDIO ENGINE
+      // ==========================================
+      const audioCore = {
+        ctx: null,
+        master: null,
+        droneNode: null,
+        filterNode: null,
+
+        init() {
+          const AC = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AC();
+          this.master = this.ctx.createGain();
+          this.master.gain.value = 0.2; // Base volume
+          this.master.connect(this.ctx.destination);
+
+          // Drone (Background Hum)
+          this.droneNode = this.ctx.createOscillator();
+          this.droneNode.type = 'sawtooth';
+          this.droneNode.frequency.value = 50;
+          
+          // Lowpass filter for "Underwater" feel
+          this.filterNode = this.ctx.createBiquadFilter();
+          this.filterNode.type = 'lowpass';
+          this.filterNode.frequency.value = 200;
+
+          this.droneNode.connect(this.filterNode);
+          this.filterNode.connect(this.master);
+          this.droneNode.start();
+
+          // LFO for filter movement
+          const lfo = this.ctx.createOscillator();
+          lfo.frequency.value = 0.1;
+          const lfoGain = this.ctx.createGain();
+          lfoGain.gain.value = 150;
+          lfo.connect(lfoGain);
+          lfoGain.connect(this.filterNode.frequency);
+          lfo.start();
+        },
+
+        playSfx(type) {
+          if (!this.ctx) return;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          
+          osc.connect(gain);
+          gain.connect(this.master);
+
+          const now = this.ctx.currentTime;
+
+          if (type === 'glitch') {
+            // White noise burst approximation
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(Math.random() * 1000 + 200, now);
+            osc.frequency.exponentialRampToValueAtTime(100, now + 0.1);
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+            osc.start(now);
+            osc.stop(now + 0.1);
+          } else if (type === 'boom') {
+            // Deep impact
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(150, now);
+            osc.frequency.exponentialRampToValueAtTime(40, now + 0.5);
+            gain.gain.setValueAtTime(0.5, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.8);
+            osc.start(now);
+            osc.stop(now + 0.8);
+          } else if (type === 'type') {
+            // High ping
+            osc.type = 'triangle';
+            osc.frequency.value = 800;
+            gain.gain.setValueAtTime(0.05, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+            osc.start(now);
+            osc.stop(now + 0.05);
+          }
+        },
+
+        toggleMute(isMuted) {
+            if(this.master) this.master.gain.value = isMuted ? 0 : 0.2;
+        }
+      };
+
+      // ==========================================
+      // 3. TIMELINE & SCENE MANAGER
+      // ==========================================
+      
+      // Utility: Typewriter effect
+      function typeWriter(elementId, text, speed = 50) {
+        const el = document.getElementById(elementId);
+        if(!el) return;
+        el.innerHTML = '';
+        let i = 0;
+        function type() {
+            if (i < text.length) {
+                el.innerHTML += text.charAt(i);
+                i++;
+                // Random typing variation
+                if(Math.random() > 0.8) audioCore.playSfx('type'); 
+                setTimeout(type, speed + (Math.random() * 30));
+            }
+        }
+        type();
+      }
+
+      const scenes = [
+        {
+          // 0: INTRO
+          at: 0,
+          render: (el) => {
+            el.innerHTML = `
+              <div class="scene-content scene-active text-center">
+                <div class="font-mono text-cyan-400 text-sm tracking-[0.5em] mb-4">IDENTITY_CONFIRMED</div>
+                <h1 class="font-tech text-7xl md:text-9xl font-black glitch-text" data-text="AMRITO DEY">AMRITO DEY</h1>
+                <div class="flex items-center justify-center gap-4 mt-6">
+                   <span class="px-3 py-1 border border-gray-700 rounded text-xs font-mono text-gray-400">EST. 2006</span>
+                   <span class="px-3 py-1 border border-gray-700 rounded text-xs font-mono text-gray-400">BD_REGION</span>
+                </div>
+              </div>
+            `;
+            audioCore.playSfx('boom');
+          }
+        },
+        {
+          // 1: SKILLS (The Builder)
+          at: 3500,
+          render: (el) => {
+            el.innerHTML = `
+              <div class="scene-content scene-active flex flex-col md:flex-row gap-12 items-center">
+                 <div class="text-right">
+                    <h2 class="font-tech text-4xl md:text-6xl text-white mb-2">FULL STACK<br/><span class="text-cyan-400">ARCHITECT</span></h2>
+                    <p class="font-mono text-gray-400 text-sm">Building digital reality.</p>
+                 </div>
+                 <div class="code-editor">
+                    <div class="flex gap-2 mb-4 border-b border-gray-800 pb-2">
+                        <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                        <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                        <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                    </div>
+                    <div id="code-target"></div>
+                    <span class="cursor"></span>
+                 </div>
+              </div>
+            `;
+            // Trigger typing slightly after render
+            setTimeout(() => {
+                const code = `<span class="syntax-keyword">const</span> <span class="syntax-def">stack</span> = {\n  lang: [<span class="syntax-string">'JS'</span>, <span class="syntax-string">'Python'</span>],\n  frame: [<span class="syntax-string">'React'</span>, <span class="syntax-string">'Three.js'</span>],\n  db: <span class="syntax-string">'MongoDB'</span>\n};`;
+                // Simple simulation of typing complex HTML
+                const target = document.getElementById('code-target');
+                target.innerHTML = code; 
+                // Use simple reveal animation for HTML content to avoid parsing issues
+                target.style.opacity = 0;
+                target.animate([{opacity:0}, {opacity:1}], {duration: 500, fill:'forwards'});
+                audioCore.playSfx('type');
+            }, 500);
+          }
+        },
+        {
+          // 2: ORIGIN (The Struggle)
+          at: 8500,
+          render: (el) => {
+            el.innerHTML = `
+              <div class="scene-content scene-active text-center">
+                 <div class="font-mono text-red-500 mb-2">System Alert: OBSTACLE_DETECTED</div>
+                 <h2 class="font-tech text-5xl md:text-7xl text-white mb-6">RELOCATED >> CUMILLA</h2>
+                 <div class="inline-block p-6 border border-red-500/30 bg-red-900/10 backdrop-blur">
+                    <p class="font-mono text-lg text-red-200">STATUS: FINANCIAL_PRESSURE</p>
+                    <p class="font-mono text-lg text-white font-bold mt-2">RESPONSE: GRIND_HARDER</p>
+                 </div>
+              </div>
+            `;
+            audioCore.playSfx('glitch');
+          }
+        },
+        {
+          // 3: VENTURES (Cards)
+          at: 13500,
+          render: (el) => {
+            el.innerHTML = `
+              <div class="scene-content scene-active flex flex-col items-center">
+                 <h3 class="font-mono text-cyan-400 mb-8 tracking-widest">ACTIVE DEPLOYMENTS</h3>
+                 <div class="flex flex-wrap justify-center gap-8">
+                    <div class="card-3d text-center w-64">
+                        <div class="text-6xl mb-4">🎓</div>
+                        <h4 class="font-tech text-xl font-bold">MENTORLY</h4>
+                        <p class="font-mono text-xs text-gray-400 mt-2">AI-Powered Education Assistant</p>
+                    </div>
+                    <div class="card-3d text-center w-64" style="border-color: var(--purple)">
+                        <div class="text-6xl mb-4">🧠</div>
+                        <h4 class="font-tech text-xl font-bold">SYNAPSE</h4>
+                        <p class="font-mono text-xs text-gray-400 mt-2">Collective Intelligence Network</p>
+                    </div>
+                 </div>
+              </div>
+            `;
+            audioCore.playSfx('boom');
+          }
+        },
+        {
+          // 4: THE DREAM (Gold)
+          at: 19000,
+          render: (el) => {
+            el.innerHTML = `
+              <div class="scene-content scene-active text-center">
+                 <div style="
+                    position: absolute; width: 300px; height: 300px; 
+                    background: radial-gradient(circle, rgba(255,215,0,0.2) 0%, rgba(0,0,0,0) 70%);
+                    filter: blur(40px); z-index: -1;">
+                 </div>
+                 <h2 class="font-tech text-6xl md:text-8xl text-yellow-400 tracking-widest mb-2">DUBAI</h2>
+                 <div class="font-mono text-white text-xl tracking-widest uppercase border-t border-yellow-500/50 pt-4 mt-2">
+                    Target Destination
+                 </div>
+              </div>
+            `;
+             audioCore.playSfx('boom');
+          }
+        },
+        {
+          // 5: VISION
+          at: 24000,
+          render: (el) => {
+             el.innerHTML = `
+              <div class="scene-content scene-active w-full max-w-4xl px-8">
+                 <div class="font-mono text-gray-500 mb-8">LOADING_MANIFESTO...</div>
+                 <div class="space-y-6">
+                    <div class="flex items-center gap-4 opacity-0" style="animation: slideIn 0.5s forwards 0.2s">
+                        <span class="text-cyan-400 font-bold text-2xl">></span>
+                        <span class="font-tech text-3xl md:text-4xl">DECENTRALIZED AI</span>
+                    </div>
+                    <div class="flex items-center gap-4 opacity-0" style="animation: slideIn 0.5s forwards 0.6s">
+                        <span class="text-cyan-400 font-bold text-2xl">></span>
+                        <span class="font-tech text-3xl md:text-4xl">HUMANOID ROBOTICS</span>
+                    </div>
+                    <div class="flex items-center gap-4 opacity-0" style="animation: slideIn 0.5s forwards 1.0s">
+                        <span class="text-cyan-400 font-bold text-2xl">></span>
+                        <span class="font-tech text-3xl md:text-4xl text-purple-400">GLOBAL IMPACT</span>
+                    </div>
+                 </div>
+                 <style>
+                    @keyframes slideIn { from { transform: translateX(-50px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+                 </style>
+              </div>
+            `;
+            audioCore.playSfx('type');
+          }
+        },
+        {
+          // 6: OUTRO
+          at: 30000,
+          render: (el) => {
+             el.innerHTML = `
+              <div class="scene-content scene-active text-center">
+                 <p class="font-mono text-cyan-400 mb-4">SEQUENCE COMPLETE</p>
+                 <h1 class="font-tech text-6xl md:text-8xl text-white mb-8 glitch-text" data-text="AMRITO DEY">AMRITO DEY</h1>
+                 <div class="flex gap-4 justify-center">
+                    <button onclick="window.location.reload()" class="px-6 py-3 border border-white/20 hover:bg-white/10 font-mono rounded transition pointer-events-auto">REPLAY</button>
+                    <button onclick="openShare()" class="px-6 py-3 bg-cyan-500/20 border border-cyan-400 hover:bg-cyan-500/40 text-cyan-300 font-mono rounded transition pointer-events-auto">SHARE PROFILE</button>
+                 </div>
+              </div>
+            `;
+             audioCore.playSfx('boom');
+          }
+        }
+      ];
+
+      // ==========================================
+      // 4. MAIN LOOP
+      // ==========================================
+      
+      let animationFrame;
+      let currentSceneIndex = -1;
+
+      function startTimeline() {
+        if (state.started) return;
         
-        function clearStage() {
-            stage.innerHTML = '';
+        // Init systems
+        audioCore.init();
+        visualCore.init();
+        
+        // UI Transition
+        dom.startScreen.style.opacity = 0;
+        setTimeout(() => dom.startScreen.style.display = 'none', 800);
+        
+        state.started = true;
+        state.startTime = performance.now();
+        
+        loop();
+      }
+
+      function loop() {
+        if (state.paused) {
+            animationFrame = requestAnimationFrame(loop);
+            return;
         }
 
-        // --- Canvas Background (The Synapse Network) ---
-        const canvas = document.getElementById('bg-canvas');
-        const ctx = canvas.getContext('2d');
-        let width, height;
-        let particles = [];
+        const now = performance.now();
+        const elapsed = now - state.startTime - state.totalOffset;
 
-        function resize() {
-            width = canvas.width = canvas.parentElement.clientWidth;
-            height = canvas.height = canvas.parentElement.clientHeight;
-        }
-        window.addEventListener('resize', resize);
-        resize();
-
-        class Particle {
-            constructor() {
-                this.x = Math.random() * width;
-                this.y = Math.random() * height;
-                this.vx = (Math.random() - 0.5) * 0.5;
-                this.vy = (Math.random() - 0.5) * 0.5;
-                this.size = Math.random() * 2;
-            }
-            update() {
-                this.x += this.vx;
-                this.y += this.vy;
-                if (this.x < 0 || this.x > width) this.vx *= -1;
-                if (this.y < 0 || this.y > height) this.vy *= -1;
-            }
-            draw() {
-                ctx.fillStyle = 'rgba(0, 243, 255, 0.5)';
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-            }
+        if (elapsed > state.duration) {
+            // End state if needed, but Outro usually holds
         }
 
-        for (let i = 0; i < 60; i++) particles.push(new Particle());
-
-        function animateBg() {
-            ctx.clearRect(0, 0, width, height);
-            
-            // Connect particles
-            ctx.strokeStyle = 'rgba(0, 243, 255, 0.1)'; // Cyan connection
-            for (let i = 0; i < particles.length; i++) {
-                particles[i].update();
-                particles[i].draw();
-                for (let j = i; j < particles.length; j++) {
-                    const dx = particles[i].x - particles[j].x;
-                    const dy = particles[i].y - particles[j].y;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist < 100) {
-                        ctx.lineWidth = 1 - dist/100;
-                        ctx.beginPath();
-                        ctx.moveTo(particles[i].x, particles[i].y);
-                        ctx.lineTo(particles[j].x, particles[j].y);
-                        ctx.stroke();
-                    }
-                }
-            }
-            requestAnimationFrame(animateBg);
+        // Scene Management
+        // Find the latest scene that should be active
+        let activeIndex = -1;
+        for(let i=0; i<scenes.length; i++) {
+            if (elapsed >= scenes[i].at) activeIndex = i;
         }
-        animateBg();
 
-        // --- Main Sequence Logic ---
-
-        async function startSequence() {
-            document.getElementById('start-screen').style.display = 'none';
-            document.getElementById('hud').style.opacity = 1;
-            document.getElementById('hud-bottom').style.opacity = 1;
-            
-            let startTime = Date.now();
-            const totalDuration = 45000; // 45 seconds approx
-
-            // Timer update loop
-            const timerInterval = setInterval(() => {
-                const elapsed = Date.now() - startTime;
-                const seconds = Math.floor(elapsed / 1000);
-                const ms = Math.floor((elapsed % 1000) / 10);
-                timerDisplay.innerText = `${seconds < 10 ? '0'+seconds : seconds}:${ms < 10 ? '0'+ms : ms}`;
-                
-                let progress = (elapsed / totalDuration) * 100;
-                if(progress > 100) progress = 100;
-                progressBar.style.width = `${progress}%`;
-            }, 50);
-
-            // --- SCENE 1: INTRO ---
-            stage.innerHTML = `
-                <div class="flex flex-col items-center justify-center h-full slide-up">
-                    <h1 class="text-6xl font-tech font-black text-white tracking-widest glitch" data-text="AMRITO DEY">AMRITO DEY</h1>
-                    <div class="mt-4 flex items-center gap-4 text-gray-400 font-mono text-lg fade-in" style="animation-delay: 0.5s">
-                        <span>19 Y/O</span>
-                        <span class="text-cyan-400">•</span>
-                        <span>BANGLADESH</span>
-                    </div>
-                </div>
-            `;
-            await wait(3500);
-
-            // --- SCENE 2: THE BUILDER (Code) ---
-            clearStage();
-            stage.innerHTML = `
-                <div class="flex flex-row items-center justify-center w-full h-full px-10">
-                    <div class="w-1/2 font-tech text-4xl font-bold text-glow-blue slide-up text-cyan-400">
-                        WEB<br>DEVELOPER
-                    </div>
-                    <div class="w-1/2 slide-up" style="animation-delay: 0.2s">
-                        <div class="code-window text-sm">
-                            <p><span class="keyword">const</span> <span class="func">techStack</span> = [<br>
-                            &nbsp;&nbsp;<span class="string">'HTML'</span>,<br>
-                            &nbsp;&nbsp;<span class="string">'CSS'</span>,<br>
-                            &nbsp;&nbsp;<span class="string">'JavaScript'</span>,<br>
-                            &nbsp;&nbsp;<span class="string">'React'</span><br>
-                            ];</p>
-                            <p class="mt-2 text-gray-500">// Building the future...</p>
-                        </div>
-                    </div>
-                </div>
-            `;
-            await wait(4000);
-
-            // --- SCENE 3: THE STRUGGLE (Darker, emotional) ---
-            clearStage();
-            stage.innerHTML = `
-                <div class="flex flex-col items-center justify-center h-full font-mono">
-                    <div class="text-2xl text-gray-500 mb-2 fade-in">ORIGIN STORY</div>
-                    <div class="text-4xl text-white font-bold fade-in" style="animation-delay: 0.8s">MOVED TO CUMILLA</div>
-                    <div class="text-red-400 mt-4 text-xl fade-in blink" style="animation-delay: 1.5s">⚠ FINANCIAL CHALLENGES</div>
-                    <div class="mt-8 text-5xl font-tech font-black text-white slide-up" style="animation-delay: 2.5s">STILL. PUSHING.</div>
-                </div>
-            `;
-            await wait(4500);
-
-            // --- SCENE 4: THE FOUNDER (Startups) ---
-            clearStage();
-            // Changing particle color to purple briefly
-            const oldStyle = ctx.fillStyle;
-            
-            stage.innerHTML = `
-                <div class="w-full h-full flex flex-col items-center justify-center">
-                    <h2 class="text-sm tracking-[0.5em] text-gray-400 mb-8 fade-in">CURRENT VENTURES</h2>
-                    
-                    <div class="flex gap-10 items-center">
-                        <div class="bg-gray-900 border border-purple-500 p-6 rounded-lg text-center slide-up hover:scale-105 transition-transform duration-500">
-                            <div class="text-5xl mb-2">🤖</div>
-                            <h3 class="text-2xl font-bold text-white mb-1">MENTORLY</h3>
-                            <p class="text-xs text-purple-400 font-mono">AI STUDENT ASSISTANT</p>
-                        </div>
-
-                        <div class="bg-gray-900 border border-cyan-500 p-6 rounded-lg text-center slide-up" style="animation-delay: 0.3s">
-                            <div class="text-5xl mb-2">🧠</div>
-                            <h3 class="text-2xl font-bold text-white mb-1">SYNAPSE</h3>
-                            <p class="text-xs text-cyan-400 font-mono">COLLECTIVES</p>
-                        </div>
-                    </div>
-                    
-                    <div class="mt-8 font-mono text-sm text-green-400 fade-in" style="animation-delay: 1s">
-                         > INNOVATION_STATUS: ACTIVE
-                    </div>
-                </div>
-            `;
-            await wait(5000);
-
-            // --- SCENE 5: THE DREAM (Dubai/Ambition) ---
-            clearStage();
-            stage.innerHTML = `
-                <div class="relative w-full h-full flex items-center justify-center overflow-hidden zoom-in">
-                    <!-- Abstract Building Silhouette using CSS borders -->
-                    <div class="absolute bottom-0 opacity-20" style="
-                        width: 0; 
-                        height: 0; 
-                        border-left: 100px solid transparent;
-                        border-right: 100px solid transparent;
-                        border-bottom: 400px solid gold;">
-                    </div>
-                    
-                    <div class="z-10 text-center">
-                        <h1 class="text-7xl font-tech font-black text-transparent bg-clip-text bg-gradient-to-b from-yellow-200 to-yellow-600 text-glow-gold slide-up">
-                            DUBAI
-                        </h1>
-                        <p class="text-xl font-mono text-white mt-4 tracking-widest fade-in" style="animation-delay: 0.5s">FINANCIAL INDEPENDENCE</p>
-                    </div>
-                </div>
-            `;
-            await wait(4000);
-
-            // --- SCENE 6: THE VISION (Future Tech) ---
-            clearStage();
-            stage.innerHTML = `
-                <div class="flex flex-col items-start justify-center h-full pl-20 font-tech">
-                    <div class="text-gray-500 text-sm mb-2">LONG TERM VISION_</div>
-                    <div class="text-4xl text-white mb-4 slide-up">
-                        <span class="text-cyan-400">></span> DECENTRALIZED AI
-                    </div>
-                    <div class="text-4xl text-white mb-4 slide-up" style="animation-delay: 0.5s">
-                        <span class="text-cyan-400">></span> HUMANOID ROBOTS
-                    </div>
-                    <div class="text-4xl text-white mb-4 slide-up" style="animation-delay: 1.0s">
-                        <span class="text-cyan-400">></span> REVOLUTIONARY IDEAS
-                    </div>
-                </div>
-            `;
-            await wait(4500);
-
-            // --- SCENE 7: OUTRO ---
-            clearStage();
-            stage.innerHTML = `
-                <div class="flex flex-col items-center justify-center h-full">
-                    <div class="text-3xl font-bold text-white mb-2 fade-in">DETERMINED.</div>
-                    <div class="text-3xl font-bold text-white mb-2 fade-in" style="animation-delay: 0.5s">CREATIVE.</div>
-                    <div class="text-3xl font-bold text-white mb-8 fade-in" style="animation-delay: 1.0s">AMBITIOUS.</div>
-                    
-                    <h1 class="text-6xl font-tech text-cyan-400 glitch scale-150" data-text="AMRITO DEY" style="animation-delay: 1.5s">
-                        AMRITO DEY
-                    </h1>
-                    
-                    <div class="mt-10 flex gap-4">
-                        <button class="text-xs border border-white px-4 py-2 rounded hover:bg-white hover:text-black transition" onclick="location.reload()">REPLAY SEQUENCE</button>
-                    </div>
-                </div>
-            `;
-            
-            clearInterval(timerInterval);
-            progressBar.style.width = '100%';
-            timerDisplay.innerText = "END";
+        if (activeIndex !== currentSceneIndex && activeIndex !== -1) {
+            currentSceneIndex = activeIndex;
+            scenes[activeIndex].render(dom.root);
         }
+
+        // Update Timer & Progress
+        const sec = Math.floor(elapsed / 1000);
+        const ms = Math.floor((elapsed % 1000) / 10);
+        dom.timer.innerText = `00:${sec < 10 ? '0'+sec : sec}:${ms < 10 ? '0'+ms : ms}`;
+        
+        const pct = Math.min((elapsed / 32000) * 100, 100); // 32s is roughly end of content
+        dom.progress.style.width = `${pct}%`;
+
+        animationFrame = requestAnimationFrame(loop);
+      }
+
+      // ==========================================
+      // 5. CONTROLS
+      // ==========================================
+      
+      dom.btnStart.addEventListener('click', startTimeline);
+      
+      dom.btnPause.addEventListener('click', togglePause);
+      document.addEventListener('keydown', (e) => {
+        if (e.code === 'Space') togglePause();
+        if (e.key === 'm' || e.key === 'M') toggleMute();
+      });
+
+      function togglePause() {
+        if(!state.started) return;
+        state.paused = !state.paused;
+        dom.btnPause.innerText = state.paused ? "RESUME [SPC]" : "PAUSE [SPC]";
+        
+        if(state.paused) {
+            state.pauseTime = performance.now();
+            if(audioCore.ctx) audioCore.ctx.suspend();
+        } else {
+            state.totalOffset += (performance.now() - state.pauseTime);
+            if(audioCore.ctx) audioCore.ctx.resume();
+        }
+      }
+
+      function toggleMute() {
+        state.muted = !state.muted;
+        audioCore.toggleMute(state.muted);
+        dom.btnMute.innerText = state.muted ? "UNMUTE [M]" : "MUTE [M]";
+        dom.btnMute.style.color = state.muted ? "red" : "white";
+      }
+
+      dom.btnDownload.addEventListener('click', () => {
+        const html = document.documentElement.outerHTML;
+        const blob = new Blob([html], { type: "text/html" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "Amrito_Dey_Profile_v3.html";
+        a.click();
+      });
+
+      window.openShare = function() {
+        alert("Profile URL copied to clipboard (Simulation)");
+      }
+
+      // Initial console signature
+      console.log("%c AMRITO DEY // SYSTEM V3 READY", "background: #000; color: #00f3ff; font-size: 12px; padding: 4px;");
 
     </script>
-</body>
+  </body>
 </html>
