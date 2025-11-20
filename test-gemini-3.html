@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amrito Dey - Motion Profile</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;600;900&family=JetBrains+Mono:wght@400;700&family=Orbitron:wght@500;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #050505;
+            color: white;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        /* The Stage - 16:9 Ratio */
+        #stage {
+            position: relative;
+            width: 100%;
+            max-width: 1000px;
+            aspect-ratio: 16/9;
+            background: #0a0a0a;
+            overflow: hidden;
+            box-shadow: 0 0 50px rgba(0, 255, 255, 0.1);
+            border: 1px solid #333;
+        }
+
+        #bg-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.4;
+        }
+
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none;
+        }
+
+        /* Utilities */
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        .font-tech { font-family: 'Orbitron', sans-serif; }
+        
+        .text-glow-blue { text-shadow: 0 0 10px rgba(0, 243, 255, 0.8); }
+        .text-glow-purple { text-shadow: 0 0 10px rgba(188, 19, 254, 0.8); }
+        .text-glow-gold { text-shadow: 0 0 15px rgba(255, 215, 0, 0.8); }
+
+        /* Animations */
+        .fade-in { animation: fadeIn 0.5s forwards; }
+        .fade-out { animation: fadeOut 0.5s forwards; }
+        .slide-up { animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .zoom-in { animation: zoomIn 4s linear forwards; }
+        .blink { animation: blink 0.8s infinite; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes zoomIn { from { transform: scale(1); } to { transform: scale(1.1); } }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        /* Glitch Effect */
+        .glitch {
+            position: relative;
+        }
+        .glitch::before, .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0a0a;
+        }
+        .glitch::before {
+            left: 2px;
+            text-shadow: -1px 0 #ff00c1;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim 5s infinite linear alternate-reverse;
+        }
+        .glitch::after {
+            left: -2px;
+            text-shadow: -1px 0 #00fff9;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim2 5s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim {
+            0% { clip: rect(34px, 9999px, 11px, 0); }
+            20% { clip: rect(68px, 9999px, 96px, 0); }
+            40% { clip: rect(12px, 9999px, 5px, 0); }
+            60% { clip: rect(89px, 9999px, 43px, 0); }
+            80% { clip: rect(2px, 9999px, 28px, 0); }
+            100% { clip: rect(56px, 9999px, 83px, 0); }
+        }
+        @keyframes glitch-anim2 {
+            0% { clip: rect(14px, 9999px, 51px, 0); }
+            20% { clip: rect(38px, 9999px, 16px, 0); }
+            40% { clip: rect(92px, 9999px, 55px, 0); }
+            60% { clip: rect(19px, 9999px, 23px, 0); }
+            80% { clip: rect(42px, 9999px, 88px, 0); }
+            100% { clip: rect(76px, 9999px, 33px, 0); }
+        }
+
+        /* Start Button Overlay */
+        #start-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .btn-cyber {
+            background: transparent;
+            border: 2px solid #00f3ff;
+            color: #00f3ff;
+            padding: 15px 40px;
+            font-family: 'Orbitron';
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-cyber:hover {
+            background: #00f3ff;
+            color: black;
+            box-shadow: 0 0 20px #00f3ff;
+        }
+
+        /* Progress Bar */
+        #progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: #00f3ff;
+            width: 0%;
+            transition: width 0.1s linear;
+            z-index: 50;
+        }
+
+        /* Custom Elements */
+        .tag-badge {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin: 5px;
+            display: inline-block;
+        }
+        
+        /* Code typing container */
+        .code-window {
+            background: #1e1e1e;
+            border-left: 4px solid #00f3ff;
+            padding: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            color: #d4d4d4;
+            width: 80%;
+            border-radius: 0 10px 10px 0;
+            box-shadow: 10px 10px 30px rgba(0,0,0,0.5);
+        }
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .func { color: #dcdcaa; }
+
+    </style>
+</head>
+<body>
+
+    <div id="stage">
+        <canvas id="bg-canvas"></canvas>
+        
+        <!-- Animation Layer -->
+        <div id="ui-layer"></div>
+        
+        <!-- Progress Timeline -->
+        <div id="progress-bar"></div>
+
+        <!-- HUD Elements (Always visible during playback) -->
+        <div id="hud" class="absolute top-4 left-4 text-xs font-mono text-gray-500 opacity-0 transition-opacity duration-500">
+            REC :: <span id="timer">00:00</span> <span class="text-red-500">●</span>
+        </div>
+        <div id="hud-bottom" class="absolute bottom-4 right-4 text-xs font-mono text-gray-500 opacity-0 transition-opacity duration-500">
+            SYS.STATUS: ONLINE // AM.DEY
+        </div>
+
+        <!-- Start Screen -->
+        <div id="start-screen">
+            <h1 class="text-4xl font-tech text-white mb-2 tracking-widest">PROFILE LOADING...</h1>
+            <p class="text-gray-400 font-mono mb-8 text-sm">INITIALIZING VISUAL SEQUENCE</p>
+            <button class="btn-cyber" onclick="startSequence()">Initialize</button>
+        </div>
+    </div>
+
+    <script>
+        // --- Utilities ---
+        const stage = document.getElementById('ui-layer');
+        const progressBar = document.getElementById('progress-bar');
+        const timerDisplay = document.getElementById('timer');
+        
+        const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+        
+        function clearStage() {
+            stage.innerHTML = '';
+        }
+
+        // --- Canvas Background (The Synapse Network) ---
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let particles = [];
+
+        function resize() {
+            width = canvas.width = canvas.parentElement.clientWidth;
+            height = canvas.height = canvas.parentElement.clientHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 0.5;
+                this.vy = (Math.random() - 0.5) * 0.5;
+                this.size = Math.random() * 2;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.x < 0 || this.x > width) this.vx *= -1;
+                if (this.y < 0 || this.y > height) this.vy *= -1;
+            }
+            draw() {
+                ctx.fillStyle = 'rgba(0, 243, 255, 0.5)';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < 60; i++) particles.push(new Particle());
+
+        function animateBg() {
+            ctx.clearRect(0, 0, width, height);
+            
+            // Connect particles
+            ctx.strokeStyle = 'rgba(0, 243, 255, 0.1)'; // Cyan connection
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+                for (let j = i; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 100) {
+                        ctx.lineWidth = 1 - dist/100;
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animateBg);
+        }
+        animateBg();
+
+        // --- Main Sequence Logic ---
+
+        async function startSequence() {
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('hud').style.opacity = 1;
+            document.getElementById('hud-bottom').style.opacity = 1;
+            
+            let startTime = Date.now();
+            const totalDuration = 45000; // 45 seconds approx
+
+            // Timer update loop
+            const timerInterval = setInterval(() => {
+                const elapsed = Date.now() - startTime;
+                const seconds = Math.floor(elapsed / 1000);
+                const ms = Math.floor((elapsed % 1000) / 10);
+                timerDisplay.innerText = `${seconds < 10 ? '0'+seconds : seconds}:${ms < 10 ? '0'+ms : ms}`;
+                
+                let progress = (elapsed / totalDuration) * 100;
+                if(progress > 100) progress = 100;
+                progressBar.style.width = `${progress}%`;
+            }, 50);
+
+            // --- SCENE 1: INTRO ---
+            stage.innerHTML = `
+                <div class="flex flex-col items-center justify-center h-full slide-up">
+                    <h1 class="text-6xl font-tech font-black text-white tracking-widest glitch" data-text="AMRITO DEY">AMRITO DEY</h1>
+                    <div class="mt-4 flex items-center gap-4 text-gray-400 font-mono text-lg fade-in" style="animation-delay: 0.5s">
+                        <span>19 Y/O</span>
+                        <span class="text-cyan-400">•</span>
+                        <span>BANGLADESH</span>
+                    </div>
+                </div>
+            `;
+            await wait(3500);
+
+            // --- SCENE 2: THE BUILDER (Code) ---
+            clearStage();
+            stage.innerHTML = `
+                <div class="flex flex-row items-center justify-center w-full h-full px-10">
+                    <div class="w-1/2 font-tech text-4xl font-bold text-glow-blue slide-up text-cyan-400">
+                        WEB<br>DEVELOPER
+                    </div>
+                    <div class="w-1/2 slide-up" style="animation-delay: 0.2s">
+                        <div class="code-window text-sm">
+                            <p><span class="keyword">const</span> <span class="func">techStack</span> = [<br>
+                            &nbsp;&nbsp;<span class="string">'HTML'</span>,<br>
+                            &nbsp;&nbsp;<span class="string">'CSS'</span>,<br>
+                            &nbsp;&nbsp;<span class="string">'JavaScript'</span>,<br>
+                            &nbsp;&nbsp;<span class="string">'React'</span><br>
+                            ];</p>
+                            <p class="mt-2 text-gray-500">// Building the future...</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            await wait(4000);
+
+            // --- SCENE 3: THE STRUGGLE (Darker, emotional) ---
+            clearStage();
+            stage.innerHTML = `
+                <div class="flex flex-col items-center justify-center h-full font-mono">
+                    <div class="text-2xl text-gray-500 mb-2 fade-in">ORIGIN STORY</div>
+                    <div class="text-4xl text-white font-bold fade-in" style="animation-delay: 0.8s">MOVED TO CUMILLA</div>
+                    <div class="text-red-400 mt-4 text-xl fade-in blink" style="animation-delay: 1.5s">⚠ FINANCIAL CHALLENGES</div>
+                    <div class="mt-8 text-5xl font-tech font-black text-white slide-up" style="animation-delay: 2.5s">STILL. PUSHING.</div>
+                </div>
+            `;
+            await wait(4500);
+
+            // --- SCENE 4: THE FOUNDER (Startups) ---
+            clearStage();
+            // Changing particle color to purple briefly
+            const oldStyle = ctx.fillStyle;
+            
+            stage.innerHTML = `
+                <div class="w-full h-full flex flex-col items-center justify-center">
+                    <h2 class="text-sm tracking-[0.5em] text-gray-400 mb-8 fade-in">CURRENT VENTURES</h2>
+                    
+                    <div class="flex gap-10 items-center">
+                        <div class="bg-gray-900 border border-purple-500 p-6 rounded-lg text-center slide-up hover:scale-105 transition-transform duration-500">
+                            <div class="text-5xl mb-2">🤖</div>
+                            <h3 class="text-2xl font-bold text-white mb-1">MENTORLY</h3>
+                            <p class="text-xs text-purple-400 font-mono">AI STUDENT ASSISTANT</p>
+                        </div>
+
+                        <div class="bg-gray-900 border border-cyan-500 p-6 rounded-lg text-center slide-up" style="animation-delay: 0.3s">
+                            <div class="text-5xl mb-2">🧠</div>
+                            <h3 class="text-2xl font-bold text-white mb-1">SYNAPSE</h3>
+                            <p class="text-xs text-cyan-400 font-mono">COLLECTIVES</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8 font-mono text-sm text-green-400 fade-in" style="animation-delay: 1s">
+                         > INNOVATION_STATUS: ACTIVE
+                    </div>
+                </div>
+            `;
+            await wait(5000);
+
+            // --- SCENE 5: THE DREAM (Dubai/Ambition) ---
+            clearStage();
+            stage.innerHTML = `
+                <div class="relative w-full h-full flex items-center justify-center overflow-hidden zoom-in">
+                    <!-- Abstract Building Silhouette using CSS borders -->
+                    <div class="absolute bottom-0 opacity-20" style="
+                        width: 0; 
+                        height: 0; 
+                        border-left: 100px solid transparent;
+                        border-right: 100px solid transparent;
+                        border-bottom: 400px solid gold;">
+                    </div>
+                    
+                    <div class="z-10 text-center">
+                        <h1 class="text-7xl font-tech font-black text-transparent bg-clip-text bg-gradient-to-b from-yellow-200 to-yellow-600 text-glow-gold slide-up">
+                            DUBAI
+                        </h1>
+                        <p class="text-xl font-mono text-white mt-4 tracking-widest fade-in" style="animation-delay: 0.5s">FINANCIAL INDEPENDENCE</p>
+                    </div>
+                </div>
+            `;
+            await wait(4000);
+
+            // --- SCENE 6: THE VISION (Future Tech) ---
+            clearStage();
+            stage.innerHTML = `
+                <div class="flex flex-col items-start justify-center h-full pl-20 font-tech">
+                    <div class="text-gray-500 text-sm mb-2">LONG TERM VISION_</div>
+                    <div class="text-4xl text-white mb-4 slide-up">
+                        <span class="text-cyan-400">></span> DECENTRALIZED AI
+                    </div>
+                    <div class="text-4xl text-white mb-4 slide-up" style="animation-delay: 0.5s">
+                        <span class="text-cyan-400">></span> HUMANOID ROBOTS
+                    </div>
+                    <div class="text-4xl text-white mb-4 slide-up" style="animation-delay: 1.0s">
+                        <span class="text-cyan-400">></span> REVOLUTIONARY IDEAS
+                    </div>
+                </div>
+            `;
+            await wait(4500);
+
+            // --- SCENE 7: OUTRO ---
+            clearStage();
+            stage.innerHTML = `
+                <div class="flex flex-col items-center justify-center h-full">
+                    <div class="text-3xl font-bold text-white mb-2 fade-in">DETERMINED.</div>
+                    <div class="text-3xl font-bold text-white mb-2 fade-in" style="animation-delay: 0.5s">CREATIVE.</div>
+                    <div class="text-3xl font-bold text-white mb-8 fade-in" style="animation-delay: 1.0s">AMBITIOUS.</div>
+                    
+                    <h1 class="text-6xl font-tech text-cyan-400 glitch scale-150" data-text="AMRITO DEY" style="animation-delay: 1.5s">
+                        AMRITO DEY
+                    </h1>
+                    
+                    <div class="mt-10 flex gap-4">
+                        <button class="text-xs border border-white px-4 py-2 rounded hover:bg-white hover:text-black transition" onclick="location.reload()">REPLAY SEQUENCE</button>
+                    </div>
+                </div>
+            `;
+            
+            clearInterval(timerInterval);
+            progressBar.style.width = '100%';
+            timerDisplay.innerText = "END";
+        }
+
+    </script>
+</body>
+</html>
