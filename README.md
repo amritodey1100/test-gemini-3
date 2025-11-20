@@ -14,7 +14,7 @@ Run: Double-click index.html to open it in your browser. Click "INITIALIZE" to s
 
 &nbsp;     <!-- Edit your HTML content here -->
 
-&nbsp;     <h1 class="font-tech ...">YOUR NAME HERE</h1>
+&nbsp;     <h1 class="font-tech ...">Amrito Dey</h1>
 
 &nbsp;   `;
 
